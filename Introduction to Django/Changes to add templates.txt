@@ -1,0 +1,177 @@
+1) Pip install Django
+
+2) Open shell and create a directory Django_tutorial
+
+3) Go into the Django_tutorial Directory
+
+4) in the command line once you are into the directory
+   Django-admin startproject mysite
+
+5)The project is created and you can then open the directory
+  to see all the files that were put into the folder
+
+6) You have a container called mysite in the directory
+
+7) The container contains another folder called my site 
+   that "mysite" is like the main hub of your application.
+
+8) Inside mysite directory there are files like _init_.py, settings.py
+   urls.py, wsgi.py
+
+9) __init__.py tells python to treat the directory as a package.
+   settings.py -> setting.py is like the main hub of your website
+                  settings.py contains your access key which allows you to
+                       to control your website and make changes.
+   urls.py -> it contains the regular expressions that will allow you to create paths
+             Regular expressions like - ^ and $ sign mean beginning and end of a string.
+
+Note: In order to process the files and run the app , you need to explicitly say 
+      which python version you need to use:
+	For MAC users: just use - python3\manage.py runserver
+        For windows users: C:\Users\Arjun Singh Yadav\AppData\Local\Programs\Python\Python35\python manage.py runserver
+----if incase that doesnt work try - python manage.py runserver
+
+10) Once you run that into the command line you will see something like this
+  ```
+Performing system checks...
+
+System check identified no issues (0 silenced).
+
+You have 13 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): admin, auth, contenttypes, sessions.
+Run 'python manage.py migrate' to apply them.
+May 11, 2017 - 19:20:20
+Django version 1.11.1, using settings 'mysite.settings'
+Starting development server at http://127.0.0.1:8000/
+Quit the server with CTRL-BREAK.
+
+```
+
+Note: Because you did for the first time, this will also come up with a error saying : you have no migrations
+Migrations are new modules or packages created by you, you can simply over come the error by following the steps Django tells you in the error.
+
+
+11) Go ahead to your browser and access the URL presented to you by Django command in the shell, In my case which is "http://127.0.0.1:8000/"
+
+12) Once you enter the url you will see:
+   It worked!
+Congratulations on your first Django-powered page.
+
+Next, start your first app by running python manage.py startapp [app_label].
+You're seeing this message because you have DEBUG = True in your Django settings file and you haven't configured any URLs. Get to work!
+
+Meaning you were successful in creating your own web app.
+
+13) Once you want to get out of the app, in the command line enter CONTROL + C
+    This will break the run 
+
+14) In order to name your application run the following command in the command line:
+	python manage.py startapp --name of the app--
+
+15) This would have created a new directory in your Django_tutorial/mysite folder, with the same name aas you mentioned in the command line
+
+16) In the folder you will see folders like 
+ ```
+migrations
+__inti__.py
+Apps - we will not be touching or editing this folder, most of the time.
+Models - this file contains metadata and all the database information
+tests.py - this file contains noting at the moment but as we provide more and more fuctionality, this file will get larger and larger, basically it
+		allows us to write these tests that will check if a user will be able to access all the functionality properly after a new update, its
+		a very good method to stop your app from breaking down when you add new fuctionalities.
+views.py - it shows what the end user views or interacts with.
+
+```
+
+17) Now to connect the app you created to the main app:
+   - go back to the Django-tutorial/myapp directory
+   - get inside the myapp folder 
+   - open settings.py
+   - under INSTALLED_APP list , add you new app by entering:
+     '--name of the app--',
+   
+18) Now in your URLS.py file in the same directory, this url.py leads to everything, here you will add a path to your new app
+   -open urls.py
+   -under urlpatterns list 
+    add a new path by simple adding a new path under 
+     
+    url(r'^admin/', admin.site.urls),
+    url(r'^$', include(--name of the app--.urls)),
+
+#here r'^$' is th url path, which here is home page, cause ^ means begin here and then $ sign means end here.
+
+19) Now in urls.py 
+     Go to imports on top and add
+     from django.conf.urls import url, include
+
+20) Now we will go back into the Django-tutorial/myapp/name-of-app folder
+   - go to views.py and edit it as following:
+   - from django.shortcuts import render
+     from django.http import HttpResponse
+
+     def index(request):
+     	return render(request, 'personal/home.html")
+	
+Note: as we do not have any urls.py file in this folder we will create one by copying the views.py file and then renaming it to urls.py
+
+21) Open this newly created urls.py file and edit it
+  -from django.conf.urls import url
+   from . import views
+
+   urlpatterns = [
+   	url(r'^$',views.index, name = 'index')]
+
+   #here r'^$' is a symbol for url
+   #views.index here is calling the index fuctiont hat we defined inside views.py
+   #and then we named this index
+
+22) In the same app directory add a new folder called Templates
+	#templates will contain your html code
+	#these html file will be rendered in your views
+	#which will be rendered at your home page
+
+23) You could have multiple headers and multiple footers, sometimes names of the hearder and footer template could be similar or get confusing
+     to be on the safer side, create folders inside templates that calls header and footer for that perticular page, as example for home page 
+	- We will create the folder personal
+	-Inside the personal folder we will create html files
+
+24) - Create a header.html file and save it inside personal folder, inside the header.html file
+ write following code.
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>Harrison Kinsley</title>
+	<meta charset="utf-8" />
+</head>
+
+<body class="body" style="background-color:#f6f6f6">
+	<div>
+	   {% block content %}
+	   {% endblock %}	
+	</div>
+</body>
+
+</html>
+
+25) In the header file, body is where most of your code goes, so the curly brases you see in 
+    between <div> cutains jinja code, 
+ -{% block content %} is starting of your jinja code
+ -{% endblock %} this is the end of the code
+
+26) Now lets add another file home.html in personal folder,
+	the home.html will contain
+
+{% extends "personal/header.html" %}
+{% block content %}
+<p>Hey! Welcome to my website! Well, I wasn't expecting guests. Um, my name is Harrison. I am a programmer.</p>
+{% endblock %}
+
+27) Now go to the shell and run 
+   - python manage.py runserver
+
+28) when you open browser
+		run:
+		localhost:8000/--name_of_app
+
+   Yayy!! you will see the app running again 			
