@@ -1,0 +1,57 @@
+We're going to cover working with models in Django. Our plan is to add the final element of our website: a blog. So far, we've worked with views and a controller, but have not really done anything with models.
+
+First off, what are models? Models contain "meta data" regarding your application's data. Generally, these models are used to describe just the elements in your database, but they can be built up to be much more than just that.
+
+Second, we know we want to make a blog. Is this blog a part of our "personal" website, or would it make more sense to be its own app? It could be a part of our personal app, but it really ought to be its own entirely. Plus, chances are, we're going to want to incorporate a blog on other apps, so let's make a new app: python manage.py startapp blog.
+
+We just added a new app. What is the first thing we should do? Right, install it!
+
+mysite/settings.py (just a portion of it)
+
+INSTALLED_APPS = [
+    'personal',
+    'blog',
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+]
+
+
+Next, we need a path to blog. /blog/ seems like a reasonable path to start with, thus in mysite/urls.py:
+
+
+from django.conf.urls import url, include
+from django.contrib import admin
+
+urlpatterns = [
+    url(r'^admin/', admin.site.urls),
+    url(r'^', include('personal.urls')),
+    url(r'^blog/', include('blog.urls')),
+]
+
+If we're going to go about including blog.urls, I suppose we had better make it, but, actually, first we're going to make a models.py!
+
+
+from django.db import models
+
+class Post(models.Model):
+    title = models.CharField(max_length = 140)
+    body = models.TextField()
+    date = models.DateTimeField()
+
+    def __str__(self):
+        return self.title
+
+Each class here is basically a database table. Each variable is a table column, and then a datatype and maybe some further attributes
+ if you like, like max_length and so on. If you wish to reference these objects and get something back besides that it is a Post or 
+Category object, then you need to define the __str__ method. If you are using Python 2.7, shame on you!... but you need to do __unicode__ 
+instead of __str__.
+
+This models.py file is straight forward, especially once you know all of the possible datatypes and such. Check out the Django Docs for
+ the Model Fields, you have a lot of options.
+
+After we define our model, we're ready to define our blog/urls.py file, set up the views, and go live, which is what we're going to 
+be doing in the next session.

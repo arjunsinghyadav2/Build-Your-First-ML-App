@@ -1,0 +1,70 @@
+we're going to cover creating more dynamic URLs. In our case, we need to have URL handling for a URL that has something 
+like /blog/2/, where the 2 corresponds to the 2nd blog post.
+
+As you may have guessed, Django saw this coming, and has you covered. In our case, and in many cases, the 2 is the 
+table's Primary Key. A primary key is a unique identifier per table in a database, no other entry should have the 
+same primary key as another. Because of this, having a Primary Key makes for an easy way to lookup elements and is 
+common practice. Because of this, Django has built this premise in quite deeply. Let's check it out. First, we'll 
+visit our blog/urls.py file, creating a url for individual blogs:
+
+from django.conf.urls import url, include
+from django.views.generic import ListView, DetailView
+from blog.models import Post
+
+urlpatterns = [ 
+                url(r'^$', ListView.as_view(
+                                    queryset=Post.objects.all().order_by("-date")[:25],
+                                    template_name="blog/blog.html")),
+
+                url(r'^(?P<pk>\d+)$', DetailView.as_view(
+                                    model = Post,
+                                    template_name="blog/post.html")),
+      
+            ]
+First, we notice our new URL pattern is slightly more complex, let's break this regular expression down: r'^(?P<pk>\d+)$'. 
+Recall that our mysite/urls.py file already starts us off by requiring the url to begin with /blog/ before the rest of 
+the URL is consulted here. The first part of this new pattern we see is parenthesis. Parenthesis in regular expressions 
+denote the exact part we want to focus on. In our case, it's everything after the beginning, and to the end. Consider 
+later on that you may have other patterns similar to this one. For now, this one is going to work, but every time you 
+add new patterns, consider that another may include it. The parenthesis means we will only work with exactly what we 
+have here, not something similar. Next, we see this a ?P. This denotes a named capturing group in regular expressions, 
+for more documentation on this, see Django Named Groups. Put simply, these groups will correspond with a request, where 
+without the named groups the request would simply contain a list of URL arguments at best, but they wouldn't be labled 
+(named). With it, Django stores the value of <pk> as pk = value, whatever that value is. This makes your URLs more 
+explicit. Since we're using regular expressions, we want to make sure we are as explicit as possible to avoid overlapping matches.
+
+Continuing on with our regular expression URL pattern: r'^(?P<pk>\d+)$', we have <pk>, which we just explained would be 
+the variable name for whatever was in place of this. In our case, when we do /blog/5/, the pk var will = 5. Next, to 
+continue being explicit, we know in the case of the blogs, the primary key is a digit. To denote digits in regular expressions 
+we use \d, then we see a +, which means "one or more," and is applying to the digit. So this means we may have "one" digit, 
+like 1 or 5, or more, like 123542 or 3522. Finally, after that digit, the url ends, which is denoted with the $. Okay, 
+we see we're using a new Generic View, the DetailView. The detail view takes a model, which we're saying is the Post. This 
+model will then be passed along and referenced by the blog/post.html template. Let's make that template now:
+
+blog/templates/blog/post.html
+
+{% extends "personal/header.html" %}
+{% block content %}
+<h3><a href="/blog/{{post.id}}">{{ post.title }}</a></h3>
+<h6> on {{ post.date }}</h6>
+
+<div class = "container">
+	{{ post.body|safe|linebreaks}}
+</div>
+<br><br>
+{% endblock %}
+
+
+To start, this page extends the header file, which we've already covered. The title is the post.title object. 
+We can do this because we passed the model through, and the model is based on the primary key from the URL (magic!). 
+From here, we can continue referencing elements from our Post model, which are populated from the database table for 
+Posts, using the row with the Primary Key that matches the one in the URL! In the body, you will notice we do
+
+
+ {{ post.body|safe|linebreaks}}. 
+
+The bars are Jinja filters. First, we do |safe, which tells Django to NOT escape the HTML, which allows us to write our blog with 
+HTML. Why might Django block HTML by default? Consider if you have a forum or comment section, and the users can post HTML. Yikes, 
+you'll have people inserting various scripts, which you definitely do not want! Since these blog posts are coming from the Admin 
+panel, which means us, we're assuming this data is going to be safe, so we can show it. Next, we use the |linebreaks filter so 
+that new lines are actually given new lines. 

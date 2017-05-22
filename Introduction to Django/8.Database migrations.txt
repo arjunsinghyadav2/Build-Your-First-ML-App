@@ -1,0 +1,38 @@
+Remember how when you create a new app, the first thing you need to do is install it? Whenever you define new models, 
+you want to migrate. If you are familiar with older versions of Django, the old syncdb command is deprecated. Nowadays, 
+first you will do
+
+python manage.py makemigrations
+
+Output:
+
+Migrations for 'blog':
+    0001_initial.py
+        - Create model Category
+        - Create model Post
+
+This makemigrations command tells Django that you've made some model changes, and you want to save them as a migration. 
+Migrations are used any time you want Django to recognize changes to the models and database schema. Adding data to an 
+existing database table, for example, is not something that needs a migration, changing that table's structure 
+(by changing the model), would require a migration. With the above command, you will now have a blog/migrations directory, 
+containing the proposed migration. You can also tell Django you want to make migrations for only a specific app, like:
+
+python manage.py makemigrations blog
+
+Once you've made migrations, nothing has actually happened yet. You can run a migrate, but there is one more check you can make:
+
+python manage.py sqlmigrate blog 0001
+
+This will output the proposed SQL that will be run for you by Django when you migrate. It is a good idea to just read it over. 
+
+
+
+If all looks good, then you will do python manage.py migrate. This will actually perform the migrations. If this is your first 
+time doing this, you should see quite a bit has been migrated.
+
+
+Most of this migration is actually for the default Django code in our application, much of which corresponds to the admin page 
+that we have yet to see, but some of that is indeed our blog model. Behind the scenes, Django has actually made our SQL table for us.
+
+Okay, let's do python manage.py runserver and see if we can load //127.0.0.1:8000/blog/. That should load, but there's nothing here. 
+No surprise, we haven't written anything in our blog!

@@ -1,0 +1,130 @@
+ We're going to use Bootstrap, which is a popular HTML/CSS and some javascript package that greatly helps people who are design deficient. Bootstrap isn't going to fix you entirely, but it can at least lend a helping hand. This website is built on Bootstrap, and my other websites, like Sentdex.com, are too. Head to Bootstrap's website and download it. Find and note to yourself the Bootstrap CDN (content delivery network). I am going to show you using Bootstrap locally so you can also learn about referencing static files. Later, you may choose to use the CDN instead, as a CDN can deliver data at a faster speed than your server, due to being in multiple locations and serving from the location closest to your end-user.
+
+Once downloaded, extract to the dist folder, open that, possibly another, and then find the css, fonts, and js directories. Head to mysite/personal, making a new directory called static, and then another called personal within that one, and place the Bootstrap directories there. The path should be mysite\personal\static\personal, starting from the root mysite. You could get away with putting these in any of the apps you have installed. Since the personal site is the "main app," I am choosing to put these files here. The CSS will dictate a lot about what your site looks like, so the most integral app should be the host.
+
+At least for me, it is already there, but now that you have static files, you will want to make sure there is a setting for them in your mysite/settings.py file:
+
+STATIC_URL = '/static/'
+It is at the very bottom in my case.
+
+This just simply looks for static files to be in the static directories of installed apps, much like Django already knows to look for templates in the template directories. Now head to your personal/templates/personal/header.html template. We're going to call our new CSS file into action.
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>Harrison Kinsley</title>
+	<meta charset="utf-8" />
+	{% load staticfiles %}
+	<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" type = "text/css"/>
+</head>
+
+<body class="body" style="background-color:#f6f6f6">
+	<div>
+	   {% block content %}
+	   {% endblock %}	
+	</div>
+</body>
+
+</html>
+The new addition here:
+
+	{% load staticfiles %}
+	<link rel="stylesheet" href="{% static 'personal/css/bootstrap.min.css' %}" type = "text/css"/>
+We use the load staticfiles command to load in all available static files. Next, we specifiy the path to the one we want in this case to reference for our stylesheet. The static directories start with /static/ and then we need to specify the rest of the way. For us, the rest of the way to the bootstrap.min.css file is personal/css/bootstrap.min.css. It is important to note here that we can use this identical reference from any other app, Django is going to look in all /static/ directories in any installed apps for this path. Alright, great, go ahead and do: python manage.py runserver, refresh your homepage, and you should at least notice the font is slightly different.
+
+
+Not winning any awards for this website yet, but let's try to improve it a bit. The main file we want to focus on, at least for now, for the general look and feel of our website is mysite/personal/templates/personal/header.html. Open that back up, and place in there something like:
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>Harrison Kinsley</title>
+	<meta charset="utf-8" />
+	{% load staticfiles %}
+	<link rel="stylesheet" href="{% static 'personal/css/bootstrap.min.css' %}" type = "text/css"/>
+	<meta name="viewport" content = "width=device-width, initial-scale=1.0">
+	
+	<style type="text/css">
+		html,
+		body {
+		  height:100%
+		}
+	</style>
+</head>
+
+<body class="body" style="background-color:#f6f6f6">
+	<div class="container-fluid" style="min-height:95%; ">
+		<div class="row">
+			  <div class="col-sm-2">
+				  <br>
+				  <center>
+					<img src="{% static 'personal/img/profile.jpg' %}" class="responsive-img" style='max-height:100px;' alt="face">
+				  </center>
+			  </div>
+			  <div class="col-sm-10">
+				  <br>
+				  <center>
+				  <h3>Programming, Teaching, Entrepreneurship</h3>
+				  </center>
+			  </div>
+		</div><hr>
+
+		<div class="row">
+		  <div class="col-sm-2">
+		  <br>
+
+		  <br>
+		   <!-- Great, til you resize. -->
+			<!--<div class="well bs-sidebar affix" id="sidebar" style="background-color:#fff">-->
+			<div class="well bs-sidebar" id="sidebar" style="background-color:#fff">
+			  <ul class="nav nav-pills nav-stacked">
+				<li><a href='/'>Home</a></li>
+				<li><a href='/blog/'>Blog</a></li>
+				<li><a href='/contact/'>Contact</a></li>
+			  </ul>
+			</div> <!--well bs-sidebar affix-->
+		  </div> <!--col-sm-2-->
+		  <div class="col-sm-10">
+		  
+			<div class='container-fluid'>
+			<br><br>
+			   {% block content %}
+			   {% endblock %}	
+			</div>
+		  </div>
+		</div> 
+	</div>
+	<footer>
+		<div class="container-fluid" style='margin-left:15px'>
+			<p><a href="#" target="blank">Contact</a> | <a href="#" target="blank">LinkedIn</a> | <a href="#" target="blank">Twitter</a> | <a href="#" target="blank">Google+</a></p>
+		</div>
+	</footer>	
+	
+</body>
+
+</html>
+Okay, so that's quite the change from before! Let's break it down a bit:
+
+<head>
+	<title>Harrison Kinsley</title>
+	<meta charset="utf-8" />
+	{% load staticfiles %}
+	<link rel="stylesheet" href="{% static 'personal/css/bootstrap.min.css' %}" type = "text/css"/>
+	<meta name="viewport" content = "width=device-width, initial-scale=1.0">
+	
+	<style type="text/css">
+		html,
+		body {
+		  height:100%
+		}
+	</style>
+</head>
+The head just contains some meta info for the most part. The only change from before is the inclusion of some more CSS. This CSS just sets it to be the case that our html and body elements will take up 100% of the website. We also added <meta name="viewport" content = "width=device-width, initial-scale=1.0">, which is mainly a suggestion by Bootstrap. Next, we begin defining a div in the body tag as a container with the minimum height of 95% of the page. We do this because we may have times when the page is longer than 100% of the page (hence needing a scrollbar), but we also don't want our footer up at the top of the page. Next, we're using these "row" elements. This is Bootstrap. So are our container-fluid divs. For the row elements, check out: Bootstrap Grids. Next, we're using a Bootstrap Nav within a combination of a well and sidebar. I included an example of an affixed sidebar, where you can scroll and the sidebar stays in place. You can comment out the way we build the div, uncomment that one, and see for yourself. The problem comes up when you go to resize the page to something more like a cell-phone size.
+
+One of the great things about Bootstrap is it is very responsive, which is something you would normally have to code in. That said, things can still go wrong, and you should always test your code on a variety of device sizes. If you want the sidebar to be affixed, check out something like this sidebar example.
+
+My best suggestion is to spend some time reading through the Bootstrap documentation. Before I start a project, I usually just pull up the documentation, open each of the main categories (CSS, JavaScript, and Components), and scroll through them. I don't read every word, I just get a refresher regarding what is available. Bootstrap also hosts quite a few examples of entire pages for design examples and ideas.
+
+Back to our current template, there is one more thing needed that you probably don't have. This template calls for a profile.jpg image with the line <img src="{% static 'personal/img/profile.jpg' %}" class="responsive-img" style='max-height:100px;' alt="face">. You will want to get an image of yourself, maybe a Python logo, or something else to put here. You can also just not have a picture at all and don't put anything.

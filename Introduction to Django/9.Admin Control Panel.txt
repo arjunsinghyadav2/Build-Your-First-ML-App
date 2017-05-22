@@ -1,0 +1,54 @@
+9th Django web development with Python tutorial, we're going to cover the admin page, along with adding some blog 
+posts to our application. Just when you thought you've seen most of the backend magic that Django has to offer, 
+there's more! The Django admin site/app is pretty incredible. This is your Admin Control Panel, and it's already done. 
+Just like Django handles your database work with the models.py, your Admin page is going to work very much in the same 
+way. To access the admin page, you visit /admin/, assuming the admin app is indeed installed:
+
+mysite/settings.py
+
+INSTALLED_APPS = [
+    'personal',
+    'blog',
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+]
+By default, the admin app is installed, it is the 'django.contrib.admin' line. So you head to admin only to find you need 
+to login, and you don't have a user. Let's make one. Head to your terminal/cmd.exe and do: python manage.py createsuperuser. 
+Name the user, give an email, and set a password. Now, run your server python manage.py runserver
+
+Next, head to //127.0.0.1:8000/admin/, and you should see something like:
+
+
+Right away, you have the management of Groups and Users. One of the users here is you, the admin, currently the only user. 
+Click on the users, then click on your username, and here's a ton of information for you. You can set all sorts of things, 
+like general user status, "staff" status, which lets the person log into the admin, and superuser status, which gives the 
+user all rights basically. Then you can begin to assign permissions and groups if you have them. To create groups, go back 
+to the main admin page, click groups, and create one.
+
+Now, this is cool, but we want more! We want to manage posts via this GUI, we want a Pony!
+
+
+You can't have a pony, but you can manage your blog via the admin, and it's super easy. Create a blog/admin.py file, and in it put:
+
+from django.contrib import admin
+from blog.models import Post
+
+admin.site.register(Post)
+
+
+Here, we are importing the admin, the Post model, and then we're registering the Post model. Simple as that. Save, and 
+then runserver again if it is not already running, and head back to //127.0.0.1:8000/admin/.
+
+
+You have a new section to play admin with, Blog. Click on the posts, there's nothing here of course. Click add, and what 
+do you know, you have a form to add a post. Django reads your models.py file to know how to structure the form. Go ahead 
+and add something here. Note that for date and time, there are "now" buttons to make life easy. Pretty cool. Save, and 
+Django goes ahead and handles the backend SQL queries to put this info in your database table. Now, head to //127.0.0.1:8000/blog/, 
+and you have an entry here! Awesome. Go ahead and add maybe 2 more entries, and now //127.0.0.1:8000/blog/ should look like:
+
+
+In our excitement, we clicked on one of the blog titles, we couldn't help it, right? Turns out it doesn't work! We get a 404.

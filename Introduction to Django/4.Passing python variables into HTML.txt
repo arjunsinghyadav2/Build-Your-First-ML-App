@@ -1,0 +1,66 @@
+we're going to cover passing variables from Python to our HTML templates. To try this, we're going to build our "contact" page. Adding a new page, of the personal app, what are we certain to need?
+
+We will need a view, and a url pattern to return that view. Let's head into the personal/views.py file first:
+
+from django.shortcuts import render
+from django.http import HttpResponse
+
+def index(request):
+    return render(request, 'personal/home.html')
+
+def contact(request):
+    return render(request, 'personal/basic.html',{'content':['If you would like to contact me, please email me.','hskinsley@gmail.com']})
+Here, we're rendering the template, and also passing a dictionary. We can then reference 'content' within our template by referencing {{ content }}, for example. This will return the value of ['If you would like to contact me, please email me.','hskinsley@gmail.com'] within our template to work with. Speaking of that template, let's make it.
+
+personal/templates/personal/basic.html
+
+{% extends "personal/header.html" %}
+{% block content %}
+	{% for c in content%}
+	   <p>{{c}}</p>
+	{% endfor %}
+{% endblock %}
+This basic.html template is aimed at producing simple text-based messages within the template. Thus,
+we can actually use it for a large variety of pages, it just happens to be a contact page in this case. 
+We take the content, which is a list, and then we use a Jinja2 for loop to iterate through the list.
+
+We've got our view done, now we need that URL pattern. How should we do it? Is contact a part of the general app,
+ or mainly the personal webapp? At least in this case, contact is personal, so I would say it belongs within that app,
+ but it really could go in either place in my opinion. Doing this will also make a problem arise for us to learn from.
+ So, let's add our URL pattern to the personal/urls.py file:
+
+from django.conf.urls import url
+from . import views
+
+urlpatterns = [
+    url(r'^$', views.index, name='index'),
+    url(r'^contact/', views.contact, name='contact'),
+    ]
+
+We can run the server, and try to visit this, however, and it doesn't work! What gives? Well, our logic for our URL
+ patterns has changed a bit fundamentally. Check out the error, we can see what Django attempted to do:
+
+Using the URLconf defined in mysite.urls, Django tried these URL patterns, in this order:
+^admin/
+^$
+The current URL, contact, didn't match any of these.
+
+This list looks a little familiar, it's the one we are using on our mysite/urls.py file. It looks like it didn't even
+ bother reading our personal/urls.py file, how rude. Actually, it's just doing what we told it to do. In fact, it even
+ has tried to speak up! Check out your terminal, and you should see a warning about the url pattern. Not only this, but
+ it tells you to remove the dollar sign to fix it! Thanks Django! Let's try that. Now we are actually using this ^$ pattern
+ in two locations, but we should be able to logically figure out this problem is caused by the main mysite/urls.py file, 
+since it basically enforces that the only way to get to the personal app is to not have any text, thus /contact/ cannot 
+simply get there. Let's remove that dollar sign from mysite/urls.py:
+
+from django.conf.urls import url, include
+from django.contrib import admin
+
+urlpatterns = [
+    url(r'^admin/', admin.site.urls),
+    url(r'^', include('personal.urls')),
+]
+
+Now run the server, and try again. You should have success when visiting http://127.0.0.1:8000/contact/
+
+Great. You can actually pretty much do anything from this point by coding various functions yourself, like accessing a database to grab data and populating the dictionary that way
